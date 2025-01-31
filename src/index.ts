@@ -12,22 +12,15 @@ import fs from "node:fs/promises";
 //│       └── hij.txt
 //└── abcs
 
-const data = [
-  {
-    name: "123",
-  },
-  { name: "ABCD" },
-  { name: "AbC", child: [{ name: 1243 }] },
-  { name: "aBc.txt" },
-  { name: "abcdefg", child: [{ name: "efg", child: [{ name: "hij.txt" }] }] },
-  { name: "abcs" },
-];
-
 function sortTree(arrOfDirent: Dirent[]) {
   return arrOfDirent.toSorted((a, b) => {
-    if (a.isFile() && !b.isFile()) return 1;
-    if (!a.isFile() && b.isFile()) return -1;
-    return 0;
+    if (a.isFile() || b.isFile()) {
+      if (a.isFile() && !b.isFile()) return 1;
+      if (!a.isFile() && b.isFile()) return -1;
+      return 0;
+    } else {
+      return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+    }
   });
 }
 
@@ -35,23 +28,23 @@ function isHidden(filename: string) {
   return /^\./.test(filename);
 }
 
-async function tree(path: string) {
+const padding = "   ";
+async function tree(path: string, indent: number = 0) {
   const listOfDir = await fs.readdir(path, { withFileTypes: true });
   const sortedDir = sortTree(listOfDir);
-
-  let fileTree = "";
-
-  sortedDir.forEach((dir) => {
-    if (isHidden(dir.name)) return;
-
-    fileTree += `|--${dir.name}\n`;
+  let test = "";
+  for (const dir of sortedDir) {
+    if (isHidden(dir.name)) continue;
+    test += padding.repeat(indent);
+    test += `|--${dir.name}\n`;
     if (dir.isDirectory()) {
-      tree(path + "/" + dir.name).then((res) => {
-        fileTree += res;
-      });
+      const res = await tree(path + "/" + dir.name, indent + 1);
+      if (res.length) {
+        test += res;
+      }
     }
-  });
-  return fileTree;
+  }
+  return test;
 }
 
 async function main() {
@@ -60,11 +53,10 @@ async function main() {
     let fileTree = path;
     let subTree = await tree(path);
     fileTree += `\n${subTree}`;
-    console.log(fileTree);
+    console.log(subTree);
   } catch (e) {
     console.error(e);
   }
 }
 
 main();
-
