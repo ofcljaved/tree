@@ -13,3 +13,4 @@ export const SINGLE_LINE = "└";
 export const DOUBLE_LINE = "├";
 export const TREE = "│";
 export const SPACE = "── ";
+export const PADDING = "   ";
