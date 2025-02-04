@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import chalk from "chalk";
 import sortTree from "./utils/sort-tree";
 import isHidden from "./utils/hidden";
 import { DOUBLE_LINE, PADDING, SINGLE_LINE, SPACE, TREE } from "./constants";
@@ -30,7 +31,11 @@ async function tree(path: string, indent: number = 0): Promise<FileTree> {
     const isLast = i === len - 1;
     const prefix = isLast ? SINGLE_LINE : DOUBLE_LINE;
 
-    subTree += `${prefix}${SPACE}${dir.name}\n`;
+    const coloredName = dir.isDirectory()
+      ? chalk.cyan.bold(dir.name)
+      : dir.name;
+
+    subTree += `${prefix}${SPACE}${coloredName}\n`;
     if (dir.isDirectory()) {
       dirCount++;
       const res = await tree(path + "/" + dir.name, indent + 1);
@@ -51,7 +56,7 @@ async function tree(path: string, indent: number = 0): Promise<FileTree> {
 }
 
 async function main() {
-  const path = "./node_modules";
+  const path = "./test";
   try {
     let fileTree = path;
     let res = await tree(path);
