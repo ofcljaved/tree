@@ -1,8 +1,12 @@
+#!/usr/bin/env node
+
 import fs from "node:fs/promises";
+import path from "node:path";
 import chalk from "chalk";
 import sortTree from "./utils/sort-tree";
 import isHidden from "./utils/hidden";
 import { DOUBLE_LINE, PADDING, SINGLE_LINE, SPACE, TREE } from "./constants";
+import { runCli } from "./cli";
 
 type FileTree = {
   dirCount: number;
@@ -56,10 +60,11 @@ async function tree(path: string, indent: number = 0): Promise<FileTree> {
 }
 
 async function main() {
-  const path = "./test";
+  const args = runCli();
+  const dirPath = path.join(process.cwd(), args.dir);
   try {
-    let fileTree = path;
-    let res = await tree(path);
+    let fileTree = chalk.cyan.bold(args.dir);
+    let res = await tree(dirPath);
     fileTree += `\n${res.subTree}`;
     let dirCount =
       res.dirCount === 0 && res.fileCount === 0
