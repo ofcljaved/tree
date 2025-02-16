@@ -1,13 +1,15 @@
 {
-  "name": "tree",
+  "name": "@ofcljaved/tree",
   "module": "index.ts",
+  "version": "0.0.2",
   "type": "module",
+  "private": false,
   "scripts": {
     "dev": "bun ./src/index.ts",
     "build": "bun build src/index.ts --outfile tree --compile"
   },
   "bin": {
-    "javed": "dist/index.js"
+    "tree": "dist/index.js"
   },
   "devDependencies": {
     "@types/bun": "latest"
